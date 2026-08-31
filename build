@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+echo "Executando build com o Bash ..."
+
+sudo apt install -y \
+  build-essential neovim curl git
+clear
+./setup

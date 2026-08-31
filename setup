@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+echo "Executando setup com o Bash ..."
+
+readonly UV_ENV="$HOME/.local/bin/uv"
+readonly CARGO_ENV="$HOME/.cargo/env"
+
+command_exists(){
+  command -v "$1" >/dev/null 2>&1
+}
+
+if ! command_exists curl; then
+  printf "curl não instalado, use ./build" >&2
+  exit 1
+fi
+
+if command_exists uv; then
+  echo "uv já instalado. $(uv --version)" >&2
+else
+  curl --fail --silent --show-error --location \
+    https://astral.sh/uv/install.sh | sh
+fi
+
+if command_exists rustup; then
+  echo "rustup já instalado. $(rustup --version)"
+else
+  curl --fail --silent --show-error --location \
+    https://sh.rustup.rs | sh -s -- -y
+fi
+
+if [[ -f "$UV_ENV" ]]; then
+  source "$UV_ENV"
+fi
+
+if [[ -f "$CARGO_ENV" ]]; then
+  source "$CARGO_ENV"
+fi
