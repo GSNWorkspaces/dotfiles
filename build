@@ -4,6 +4,7 @@ set -Eeuo pipefail
 
 echo "Executando build com o Bash ..."
 
+sudo apt update
 sudo apt install -y \
   build-essential neovim curl git
 clear
