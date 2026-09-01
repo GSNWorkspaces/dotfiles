@@ -1,39 +1,50 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -Eeuo pipefail
 
 echo "Executando setup com o Bash ..."
 
-readonly UV_ENV="$HOME/.local/bin/uv"
-readonly CARGO_ENV="$HOME/.cargo/env"
+export PATH="$HOME/.local/bin:$HOME/.pixi/bin:$PATH"
 
-command_exists(){
+command_exists() {
   command -v "$1" >/dev/null 2>&1
 }
 
 if ! command_exists curl; then
-  printf "curl não instalado, use ./build" >&2
+  printf '%s\n' \
+    'curl não está instalado. Execute o script de build primeiro.' >&2
   exit 1
 fi
 
 if command_exists uv; then
-  echo "uv já instalado. $(uv --version)" >&2
+  printf 'uv já instalado: %s\n' "$(uv --version)" >&2
 else
   curl --fail --silent --show-error --location \
     https://astral.sh/uv/install.sh | sh
+  export PATH="$HOME/.local/bin:$PATH"
+fi
+
+if command_exists pixi; then
+  printf 'pixi já instalado: %s\n' "$(pixi --version)" >&2
+else
+  curl --fail --silent --show-error --location \
+    https://pixi.sh/install.sh | sh
+  export PATH="$HOME/.pixi/bin:$PATH"
 fi
 
 if command_exists rustup; then
-  echo "rustup já instalado. $(rustup --version)"
+  printf 'rustup já instalado: %s\n' "$(rustup --version)" >&2
 else
   curl --fail --silent --show-error --location \
     https://sh.rustup.rs | sh -s -- -y
 fi
 
-if [[ -f "$UV_ENV" ]]; then
-  source "$UV_ENV"
+if [[ -f "$HOME/.cargo/env" ]]; then
+  # shellcheck disable=SC1091
+  source "$HOME/.cargo/env"
 fi
 
-if [[ -f "$CARGO_ENV" ]]; then
-  source "$CARGO_ENV"
-fi
+printf '\nInstalação concluída:\n'
+uv --version
+pixi --version
+rustup --version
